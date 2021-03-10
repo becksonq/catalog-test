@@ -31,4 +31,15 @@ class ProductQuery extends \yii\db\ActiveQuery
     {
         return parent::one($db);
     }
+
+    /**
+     * @param null $alias
+     * @return ProductQuery
+     */
+    public function active($alias = null)
+    {
+        return $this->andWhere([
+            ($alias ? $alias . '.' : '') . 'status' => Product::STATUS_ACTIVE,
+        ]);
+    }
 }

@@ -17,6 +17,9 @@ use Yii;
  */
 class Currency extends \yii\db\ActiveRecord
 {
+    //@todo: сделать другой указатель
+    const ORIGIN_PRICE = 'рубль';
+
     /**
      * {@inheritdoc}
      */
