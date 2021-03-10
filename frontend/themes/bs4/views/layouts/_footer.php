@@ -4,7 +4,7 @@ use yii\helpers\Html;
 
 ?>
 
-<footer class="text-muted fixed-bottom">
+<footer class="text-muted fixed-bottom bg-warning pt-3">
     <div class="container">
         <p class="float-right">
             <a href="#">Back to top</a>

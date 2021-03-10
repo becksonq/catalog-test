@@ -11,8 +11,8 @@ NavBar::begin([
     'brandLabel' => Yii::$app->name,
     'brandUrl'   => Yii::$app->homeUrl,
     'options'    => [
-        'class' => 'navbar navbar-expand-lg navbar-light',
-        'style' => 'background-color: #42d697;',
+        'class' => 'navbar navbar-expand-lg navbar-light bg-warning',
+//        'style' => "background-color: #e3f2fd;"
     ],
 ]);
 
@@ -23,24 +23,30 @@ echo Nav::widget([
             'url'   => Url::to('/site/index'),
         ],
         [
-            'label' => 'Apples',
-            'url'   => Url::to(['/apples/apples/index'])
+            'label'   => Yii::t('app', 'Catalog'),
+            'url'     => Url::to(['/catalog/index']),
+            'visible' => Yii::$app->user->isGuest,
         ],
         [
-            'label'   => Yii::t('app', 'Вход'),
-            'url'     => Url::to(['/user/registration/register']),
+            'label'   => 'Signup',
+            'url'     => Url::to(['/site/signup']),
+            'visible' => Yii::$app->user->isGuest,
+        ],
+        [
+            'label'   => 'Login',
+            'url'     => Url::to(['/site/login']),
             'visible' => Yii::$app->user->isGuest,
         ],
         [
             'label'       => Yii::t('app', 'Выйти'),
-            'url'         => Url::to(['/user/security/logout']),
+            'url'         => Url::to(['/site/logout']),
             'visible'     => !Yii::$app->user->isGuest,
             'linkOptions' => [
                 'data-method' => 'post',
             ],
         ],
     ],
-    'options' => ['class' => 'navbar-nav ml-5'],
+    'options' => ['class' => 'navbar-nav ml-5 '],
 ]);
 NavBar::end();
 

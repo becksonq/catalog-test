@@ -8,6 +8,7 @@ $params = array_merge(
 
 return [
     'id' => 'app-frontend',
+    'name' => 'Catalog',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
@@ -36,14 +37,22 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
+        'view' => [
+            'theme' => [
+                'basePath' => '@frontend/themes/bs4',
+                'baseUrl'  => '@web/themes/bs4',
+                'pathMap'  => [
+                    '@frontend/views' => '@frontend/themes/bs4/views',
+                ],
+            ],
+        ],
+
     ],
     'params' => $params,
 ];
