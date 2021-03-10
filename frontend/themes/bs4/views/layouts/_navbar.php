@@ -11,8 +11,8 @@ NavBar::begin([
     'brandLabel' => Yii::$app->name,
     'brandUrl'   => Yii::$app->homeUrl,
     'options'    => [
-        'class' => 'navbar navbar-expand-lg navbar-light bg-warning',
-//        'style' => "background-color: #e3f2fd;"
+        'class' => 'navbar navbar-expand-lg navbar-light',
+        'style' => "background-color: #e3f2fd;"
     ],
 ]);
 
