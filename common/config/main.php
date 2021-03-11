@@ -14,4 +14,9 @@ return [
             'nullDisplay' => '-',
         ],
     ],
+     'modules' => [
+        'promocode' => [
+            'class' => 'catalog\modules\promocode\PromocodeModule',
+        ],
+    ],
 ];

@@ -32,6 +32,7 @@
                 'items' => [
                     ['label' => 'Products', 'icon' => 'file-code-o', 'url' => ['/product']],
                     ['label' => 'Currency', 'icon' => 'file-code-o', 'url' => ['/currency']],
+                    ['label' => 'Promocodes', 'icon' => 'file-code-o', 'url' => ['/promocode']],
                     ['label' => 'Menu Yii2', 'options' => ['class' => 'header']],
                     ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                     ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],

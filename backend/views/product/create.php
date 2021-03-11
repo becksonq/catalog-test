@@ -5,6 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model catalog\models\product\Product
  * @var $currencyList array
+ * @var $promocodesList array
  */
 
 $this->title = Yii::t('app', 'Create Product');
@@ -18,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $this->render('_form', [
         'model'        => $model,
         'currencyList' => $currencyList,
+        'promocodesList' => $promocodesList,
     ]) ?>
 
 </div>

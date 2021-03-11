@@ -5,6 +5,7 @@ namespace frontend\controllers;
 
 
 use catalog\models\product\ProductService;
+use catalog\models\product\PromocodeForm;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -38,9 +39,17 @@ class CatalogController extends Controller
     public function actionIndex()
     {
         $dataProvider = $this->_service->findAll();
+        $promocodeForm = new PromocodeForm();
+
+        if ($promocodeForm->load(Yii::$app->request->post()) && $promocodeForm->validate())
+        {
+            $this->_service->applyPromocode(Yii::$app->request->post('PromocodeForm')['name']);
+            return $this->redirect('index');
+        }
 
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
+            'dataProvider'  => $dataProvider,
+            'promocodeForm' => $promocodeForm,
         ]);
     }
 
@@ -54,5 +63,11 @@ class CatalogController extends Controller
             return Yii::$app->response->data = Json::encode(['dataProvider' => $dataProvider]);
         }
         return false;
+    }
+
+    public function actionRemoveDiscount(int $id)
+    {
+        $this->_service->removeDiscount($id);
+        return $this->redirect('index');
     }
 }

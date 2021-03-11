@@ -10,6 +10,7 @@ use catalog\models\product\Product;
 /* @var $dataProvider yii\data\ActiveDataProvider
  * @var $currencyList array
  * @var $statusList array
+ * @var $promocodesList array
  */
 
 $this->title = Yii::t('app', 'Products');
@@ -37,34 +38,50 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
             'slug',
             'price',
+            'old_price',
             [
                 'attribute' => 'currency_id',
                 'label'     => 'Currency',
                 'value'     => function (Product $model) {
                     return $model->currency->type;
                 },
-                'filter' => $currencyList
+                'filter'    => $currencyList
             ],
             [
                 'attribute' => 'status',
-                'format'=>'text',
+                'format'    => 'text',
                 'value'     => function (Product $model) use ($statusList) {
                     return $statusList[$model->status];
                 },
-                'filter' => $statusList
+                'filter'    => $statusList
             ],
             [
                 'header' => '<i class="fa fa-refresh" aria-hidden="true"></i>',
                 'format' => 'raw',
                 'value'  => function (Product $model) {
-                    return Html::a('<i class="fa fa-refresh" aria-hidden="true"></i>', ['status', 'status' => $model->status, 'id' => $model->id], [
+                    return Html::a('<i class="fa fa-refresh" aria-hidden="true"></i>',
+                        ['status', 'status' => $model->status, 'id' => $model->id], [
                             'class' => 'btn btn-success',
                             'title' => 'Изменить статус'
                         ]);
                 }
             ],
-            'created_at:dateTime',
-            //'updated_at',
+            [
+                'attribute' => 'promocode_id',
+                'value'     => function (Product $model) use ($promocodesList) {
+                    return $promocodesList[$model->promocode_id];
+                },
+                'filter'    => $promocodesList,
+            ],
+            [
+                'attribute' => 'promo_status',
+                'value' => function (Product $model) {
+                    return $model->promo_status == 0 ? 'No' : 'Yes';
+                },
+                'filter' => ['1' => 'Yes', '0' => 'No'],
+            ],
+//            'created_at:dateTime',
+            //'updated_at:dateTime',
 
             ['class' => 'yii\grid\ActionColumn',],
         ],

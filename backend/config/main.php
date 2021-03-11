@@ -47,6 +47,7 @@ return [
     'controllerMap'       => [
         'product' => 'backend\controllers\product\ProductController',
         'currency' => 'backend\controllers\currency\CurrencyController',
+        'promocode' => 'catalog\modules\promocode\controllers\PromocodeController',
     ],
     'params'              => $params,
 ];

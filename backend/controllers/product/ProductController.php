@@ -4,6 +4,7 @@ namespace backend\controllers\product;
 
 use catalog\models\currency\CurrencyService;
 use catalog\models\product\ProductService;
+use catalog\modules\promocode\models\PromocodeService;
 use Yii;
 use catalog\models\product\Product;
 use catalog\models\product\ProductSearch;
@@ -22,19 +23,30 @@ class ProductController extends Controller
     /** @var CurrencyService $_currencyService */
     private $_currencyService;
 
+    /** @var PromocodeService $_promocodeService */
+    private $_promocodeService;
+
     /**
      * ProductController constructor.
      * @param $id
      * @param $module
      * @param ProductService $service
      * @param CurrencyService $currencyService
+     * @param PromocodeService $promocodeService
      * @param array $config
      */
-    public function __construct($id, $module, ProductService $service, CurrencyService $currencyService, $config = [])
-    {
+    public function __construct(
+        $id,
+        $module,
+        ProductService $service,
+        CurrencyService $currencyService,
+        PromocodeService $promocodeService,
+        $config = []
+    ) {
         parent::__construct($id, $module, $config);
         $this->_service = $service;
         $this->_currencyService = $currencyService;
+        $this->_promocodeService = $promocodeService;
     }
 
     /**
@@ -62,10 +74,11 @@ class ProductController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel'  => $searchModel,
-            'dataProvider' => $dataProvider,
-            'currencyList' => $this->_currencyService->currencyList(),
-            'statusList'   => $this->_service->statusList(),
+            'searchModel'    => $searchModel,
+            'dataProvider'   => $dataProvider,
+            'currencyList'   => $this->_currencyService->currencyList(),
+            'statusList'     => $this->_service->statusList(),
+            'promocodesList' => $this->_promocodeService->promocodesList(),
         ]);
     }
 
@@ -91,14 +104,16 @@ class ProductController extends Controller
     {
         $model = new Product();
         $currencyList = $this->_currencyService->currencyList();
+        $promocodeList = $this->_promocodeService->promocodesList();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('create', [
-            'model'        => $model,
-            'currencyList' => $currencyList,
+            'model'          => $model,
+            'currencyList'   => $currencyList,
+            'promocodesList' => $promocodeList,
         ]);
     }
 
@@ -113,14 +128,16 @@ class ProductController extends Controller
     {
         $model = $this->findModel($id);
         $currencyList = $this->_currencyService->currencyList();
+        $promocodeList = $this->_promocodeService->promocodesList();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
-            'model' => $model,
-            'currencyList' => $currencyList,
+            'model'          => $model,
+            'currencyList'   => $currencyList,
+            'promocodesList' => $promocodeList,
         ]);
     }
 

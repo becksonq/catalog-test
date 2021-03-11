@@ -1,6 +1,8 @@
 <?php
 
 use yii\bootstrap4\Html;
+use catalog\models\product\ProductService;
+use yii\helpers\Url;
 
 /** @var $model \catalog\models\product\Product */
 ?>
@@ -9,12 +11,25 @@ use yii\bootstrap4\Html;
     <div class="card">
         <div class="card-body">
             <?= Html::tag('h5', $model->name, ['class' => 'card-title']) ?>
-            <p class="card-text">Цена: <?= $model->price ?></p>
+
+            <p class="card-text">Цена: <?= sprintf("%.2f", $model->price) ?>
+                <?php if ($model->old_price !== null) : ?>
+                    <del><?= sprintf("%.2f", $model->old_price) ?></del>
+                <?php endif; ?>
+            </p>
+
             <?php
             if ($model->currency->type !== \catalog\models\currency\Currency::ORIGIN_PRICE) : ?>
-                <p class="card-text">Цена в рублях: <?= $model->price * $model->currency->rate ?></p>
+                <p class="card-text">Цена в рублях: <?= sprintf("%.2f", ($model->price * $model->currency->rate)) ?> руб.</p>
             <?php endif; ?>
-            <?= Html::a('Смотреть', null, [
+            <p class="card-text">
+                <?= ProductService::isPromocode($model) ?>
+                <?= Html::a('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+  <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+</svg>', Url::to(['remove-discount', 'id' => $model->id]), ['class' => 'btn btn-light btn-sm', 'title' => 'Отменить промокод']) ?>
+            </p>
+            <?= Html::a('Перейти', null, [
                 'class' => 'btn btn-primary',
                 'href'  => 'javascript:void(0);',
             ]) ?>
