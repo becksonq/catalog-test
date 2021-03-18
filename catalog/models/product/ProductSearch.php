@@ -16,7 +16,7 @@ class ProductSearch extends Product
     public function rules()
     {
         return [
-            [['id', 'price_id', 'status', 'promocode_id', 'promo_status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'price', 'old_price', 'currency_id', 'status', 'promocode_id', 'promo_status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'slug'], 'safe'],
         ];
     }
@@ -58,7 +58,9 @@ class ProductSearch extends Product
         // grid filtering conditions
         $query->andFilterWhere([
             'id'           => $this->id,
-            'price_id'     => $this->price_id,
+            'price'        => $this->price,
+            'old_price'    => $this->old_price,
+            'currency_id'  => $this->currency_id,
             'status'       => $this->status,
             'promocode_id' => $this->promocode_id,
             'promo_status' => $this->promo_status,

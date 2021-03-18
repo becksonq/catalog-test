@@ -8,7 +8,6 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm
  * @var $currencyList array
  * @var $promocodesList array
- * @var $priceForm \catalog\models\price\PriceForm
  */
 ?>
 
@@ -20,9 +19,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($productForm, 'slug')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($priceForm, 'price')->textInput() ?>
+    <?= $form->field($productForm, 'price')->textInput() ?>
 
-<!--    --><?//= $form->field($productForm, 'currency_id')->dropDownList($currencyList) ?>
+    <?= $form->field($productForm, 'currency_id')->dropDownList($currencyList) ?>
 
     <?= $form->field($productForm, 'promocode_id')->dropDownList($promocodesList, ['prompt' => 'Выберите скидку']) ?>
 

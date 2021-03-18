@@ -3,7 +3,6 @@
 namespace backend\controllers\product;
 
 use catalog\models\currency\CurrencyService;
-use catalog\models\price\PriceForm;
 use catalog\models\product\ProductForm;
 use catalog\models\product\ProductService;
 use catalog\modules\promocode\models\PromocodeService;
@@ -136,14 +135,12 @@ class ProductController extends Controller
     {
         $model = $this->findModel($id);
         $productForm = new ProductForm($model);
-        $priceForm = new PriceForm($model->price);
         $currencyList = $this->_currencyService->currencyList();
         $promocodeList = $this->_promocodeService->promocodesList();
-//!d(Yii::$app->request->post());die;
-        if (($productForm->load(Yii::$app->request->post()) && $productForm->validate())
-            && ($priceForm->load(Yii::$app->request->post()) && $priceForm->validate())) {
+
+        if ($productForm->load(Yii::$app->request->post()) && $productForm->validate()) {
             try {
-                $this->_service->edit($id, $productForm, $priceForm);
+                $this->_service->edit($id, $productForm);
                 return $this->redirect(['view', 'id' => $model->id]);
             } catch (\DomainException $e) {
                 //@todo запись в лог
@@ -156,7 +153,6 @@ class ProductController extends Controller
             'currencyList'   => $currencyList,
             'promocodesList' => $promocodeList,
             'productForm'    => $productForm,
-            'priceForm'      => $priceForm,
         ]);
     }
 

@@ -4,7 +4,6 @@
 namespace catalog\models\product;
 
 use catalog\models\currency\Currency;
-use catalog\models\price\PriceForm;
 use catalog\modules\promocode\models\Promocode;
 use catalog\modules\promocode\models\PromocodeRepository;
 
@@ -52,13 +51,13 @@ class ProductService
      * @param ProductForm $form
      * @throws \yii\web\NotFoundHttpException
      */
-    public function edit(int $id, ProductForm $form, PriceForm $priceForm)
+    public function edit(int $id, ProductForm $form)
     {
         $product = $this->_repository->getOne($id);
         $product->edit(
             $form->name,
             $form->slug,
-            $priceForm->id,
+            $form->price,
             $form->promocode_id
         );
 

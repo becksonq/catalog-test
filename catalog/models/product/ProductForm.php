@@ -17,8 +17,9 @@ class ProductForm extends Model
 {
     public $name;
     public $slug;
-//    public $price;
+    public $price;
     public $status;
+    public $currency_id;
     public $promocode_id;
     public $promo_status;
     public $created_at;
@@ -36,7 +37,8 @@ class ProductForm extends Model
         if ($product) {
             $this->name = $product->name;
             $this->slug = $product->slug;
-//            $this->price = $product->price;
+            $this->price = $product->price;
+            $this->currency_id = $product->currency_id;
             $this->promocode_id = $product->promocode_id;
             $this->_product = $product;
         }
@@ -51,7 +53,7 @@ class ProductForm extends Model
         return [
             [['name',], 'required'],
             [['status', 'created_at', 'updated_at', 'promocode_id', 'promo_status',], 'integer'],
-//            [['price',], 'double'],
+            [['price',], 'double'],
             [['name', 'slug'], 'string', 'max' => 255],
             [
                 ['slug'],
@@ -59,13 +61,13 @@ class ProductForm extends Model
                 'targetClass' => Product::class,
                 'filter'      => $this->_product ? ['<>', 'id', $this->_product->id] : null
             ],
-//            [
-//                ['currency_id'],
-//                'exist',
-//                'skipOnError' => true,
-//                'targetClass' => Currency::class,
-//                'targetAttribute' => ['currency_id' => 'id']
-//            ],
+            [
+                ['currency_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Currency::class,
+                'targetAttribute' => ['currency_id' => 'id']
+            ],
         ];
     }
 }

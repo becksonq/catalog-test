@@ -2,7 +2,7 @@
 
 namespace catalog\models\product;
 
-use catalog\models\price\Price;
+use catalog\models\currency\Currency;
 use catalog\modules\promocode\models\Promocode;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
@@ -14,14 +14,16 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $name
  * @property string|null $slug
- * @property int $price_id
+ * @property float|null $price
+ * @property float|null $old_price
+ * @property int|null $currency_id
  * @property int|null $status
  * @property int $promocode_id
  * @property boolean $promo_status
  * @property int $created_at
  * @property int $updated_at
  *
- * @property Price $price
+ * @property Currency $currency
  * @property Promocode $promocode
  */
 class Product extends \yii\db\ActiveRecord
@@ -69,12 +71,12 @@ class Product extends \yii\db\ActiveRecord
                 'lowercase'            => true,
                 'immutable'            => false,
                 // If intl extension is enabled, see http://userguide.icu-project.org/transforms/general.
-                'transliterateOptions' => 'Russian-Latin/BGN; Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC;'
+//                'transliterateOptions' => 'Russian-Latin/BGN; Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC;'
             ],
             'saveRelations' => [
                 'class'     => SaveRelationsBehavior::class,
                 'relations' => [
-                    'price',
+//                    'price',
                 ],
             ],
         ];
@@ -89,7 +91,9 @@ class Product extends \yii\db\ActiveRecord
             'id'           => Yii::t('app', 'ID'),
             'name'         => Yii::t('app', 'Name'),
             'slug'         => Yii::t('app', 'Slug'),
-            'price_id'     => Yii::t('app', 'Price ID'),
+            'price'        => Yii::t('app', 'Price'),
+            'old_price'    => Yii::t('app', 'Old Price'),
+            'currency_id'  => Yii::t('app', 'Currency ID'),
             'status'       => Yii::t('app', 'Status'),
             'promocode_id' => Yii::t('app', 'Promocode'),
             'promo_status' => Yii::t('app', 'Promo Status'),
@@ -106,12 +110,12 @@ class Product extends \yii\db\ActiveRecord
      * @param $promocodeId
      * @return static
      */
-    public static function create($name, $slug, $priceId, $promocodeId): self
+    public static function create($name, $slug, $price, $promocodeId): self
     {
         $product = new self();
         $product->name = $name;
         $product->slug = $slug;
-        $product->price_id = $priceId;
+        $product->price = $price;
         $product->status = self::STATUS_DRAFT;
         $product->promocode_id = $promocodeId;
         return $product;
@@ -124,22 +128,22 @@ class Product extends \yii\db\ActiveRecord
      * @param $currencyId
      * @param $promocodeId
      */
-    public function edit($name, $slug, $priceId, $promocodeId): void
+    public function edit($name, $slug, $price, $promocodeId): void
     {
         $this->name = $name;
         $this->slug = $slug;
-        $this->price_id = $priceId;
+        $this->price = $price;
         $this->promocode_id = $promocodeId;
     }
 
     /**
-     * Gets query for [[Pricies]].
+     * Gets query for [[Currency]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPrice()
+    public function getCurrency()
     {
-        return $this->hasOne(Price::class, ['id' => 'price_id']);
+        return $this->hasOne(Currency::class, ['id' => 'currency_id']);
     }
 
     /**

@@ -35,11 +35,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'name',
             'slug',
+            'price',
+            'old_price',
             [
-                'attribute' =>    'price_id',
-                'header' => 'Price',
-                'value' => 'price.price',
-                'options'   => ['width' => '100'],
+                'attribute' => 'currency_id',
+                'label'     => 'Currency',
+                'value'     => function (Product $model) {
+                    return $model->currency->type;
+                },
+                'filter'    => $currencyList
             ],
             [
                 'attribute' => 'status',
