@@ -6,6 +6,7 @@ namespace catalog\models\product;
 use catalog\models\currency\Currency;
 use catalog\modules\promocode\models\Promocode;
 use catalog\modules\promocode\models\PromocodeRepository;
+use Yii;
 
 /**
  * Class ProductService
@@ -53,7 +54,7 @@ class ProductService
      */
     public function edit(int $id, ProductForm $form)
     {
-        $product = $this->_repository->getOne($id);
+        $product = $this->_repository->getById($id);
         $product->edit(
             $form->name,
             $form->slug,
@@ -73,6 +74,23 @@ class ProductService
     }
 
     /**
+     * Получаем данные для json
+     *
+     * @return array
+     */
+    public function jsonData(): array
+    {
+        $data = [];
+        $dataProvider = $this->_repository->getJsonData();
+        foreach ($dataProvider->getModels() as $model){
+           $data['pages'][] = $model;
+        }
+        $data['pagination'] = $dataProvider->pagination;
+
+        return $data;
+    }
+
+    /**
      * Применяем скидку
      *
      * @param string $name
@@ -80,6 +98,10 @@ class ProductService
     public function applyPromocode(string $name): void
     {
         $promocode = $this->_promocodeRepository->getByName($name);
+        if ($promocode == null) {
+            throw new \DomainException('Promo code not found');
+        }
+
         $products = $this->_repository->getByPromocode($promocode->id);
         foreach ($products as $product) {
             $product->promo_status = Product::PROMO_APPLY;
@@ -128,7 +150,7 @@ class ProductService
      */
     public function removeDiscount(int $id): void
     {
-        $model = $this->_repository->getOne($id);
+        $model = $this->_repository->getById($id);
         $model->promo_status = 0;
         $model->price = $model->old_price;
         $model->old_price = null;
@@ -146,21 +168,4 @@ class ProductService
         ];
     }
 
-    /**
-     * @param Product $model
-     * @return string
-     */
-    public static function isPromocode(Product $model): string
-    {
-        $html = '';
-        // Если есть промокод но он не применен
-        if ($model->promocode_id !== null && $model->promo_status == Product::PROMO_NOT_APPLY) {
-            $html = '<p class="card-text text-primary">Доступен промокод</p>';
-        }
-        if ($model->promocode_id !== null && $model->promo_status == Product::PROMO_APPLY) {
-            $html = '<p class="card-text text-success">Промокод применен</p>';
-        }
-
-        return $html;
-    }
 }

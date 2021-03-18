@@ -18,7 +18,7 @@ class ProductRepository
      * @return Product
      * @throws NotFoundHttpException
      */
-    public function getOne($id): Product
+    public function getById($id): Product
     {
         if (!$product = Product::findOne($id)) {
             throw new NotFoundHttpException('Product is not found.');
@@ -35,6 +35,16 @@ class ProductRepository
             ->where(['status' => Product::STATUS_ACTIVE])
             ->with('currency')
             ->orderBy(['p.created_at' => SORT_DESC]);
+        return $this->_getProvider($query);
+    }
+
+    public function getJsonData()
+    {
+        $query = Product::find()->alias('p')
+            ->where(['status' => Product::STATUS_ACTIVE])
+            ->with('currency')
+            ->orderBy(['p.created_at' => SORT_DESC])
+            ->asArray();
         return $this->_getProvider($query);
     }
 

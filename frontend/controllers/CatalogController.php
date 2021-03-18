@@ -9,6 +9,7 @@ use catalog\models\product\PromocodeForm;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
+use yii\web\Response;
 
 /**
  * Class CatalogController
@@ -41,12 +42,6 @@ class CatalogController extends Controller
         $dataProvider = $this->_service->findAll();
         $promocodeForm = new PromocodeForm();
 
-        if ($promocodeForm->load(Yii::$app->request->post()) && $promocodeForm->validate())
-        {
-            $this->_service->applyPromocode(Yii::$app->request->post('PromocodeForm')['name']);
-            return $this->redirect('index');
-        }
-
         return $this->render('index', [
             'dataProvider'  => $dataProvider,
             'promocodeForm' => $promocodeForm,
@@ -54,17 +49,35 @@ class CatalogController extends Controller
     }
 
     /**
-     * @return false|string
+     * @return bool|Response
      */
-    public function actionIndexJson()
+    public function actionApplyPromocode()
     {
-        if (Yii::$app->request->isAjax) {
-            $dataProvider = $this->_service->findAll();
-            return Yii::$app->response->data = Json::encode(['dataProvider' => $dataProvider]);
+        $promocodeForm = new PromocodeForm();
+        if ($promocodeForm->load(Yii::$app->request->post()) && $promocodeForm->validate()) {
+            $this->_service->applyPromocode(Yii::$app->request->post('PromocodeForm')['name']);
+            return $this->redirect('index');
         }
         return false;
     }
 
+    /**
+     * @return array|bool
+     */
+    public function actionIndexJson()
+    {
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return Yii::$app->response->data = $this->_service->jsonData();
+        }
+        return false;
+    }
+
+    /**
+     * @param int $id
+     * @return Response
+     * @throws \yii\web\NotFoundHttpException
+     */
     public function actionRemoveDiscount(int $id)
     {
         $this->_service->removeDiscount($id);

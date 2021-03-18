@@ -14,10 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-create">
 
-    <?= $this->render('_form', [
-        'productForm'    => $productForm,
-        'currencyList'   => $currencyList,
-        'promocodesList' => $promocodesList,
-    ]) ?>
+    <?= $this->render('_form', compact('productForm', 'currencyList', 'promocodesList')) ?>
 
 </div>

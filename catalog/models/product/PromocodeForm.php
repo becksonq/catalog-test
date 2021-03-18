@@ -33,6 +33,7 @@ class PromocodeForm extends \yii\base\Model
     public function rules(): array
     {
         return [
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
         ];
     }

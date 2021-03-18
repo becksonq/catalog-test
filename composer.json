@@ -21,7 +21,8 @@
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "dmstr/yii2-adminlte-asset": "2.*",
         "zelenin/yii2-slug-behavior": "~1.5.1",
-        "la-haute-societe/yii2-save-relations-behavior": "^1.7"
+        "la-haute-societe/yii2-save-relations-behavior": "^1.7",
+        "npm-asset/bootstrap-icons": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

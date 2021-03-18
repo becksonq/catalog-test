@@ -104,7 +104,7 @@ class ProductController extends Controller
     public function actionCreate()
     {
         $currencyList = $this->_currencyService->currencyList();
-        $promocodeList = $this->_promocodeService->promocodesList();
+        $promocodesList = $this->_promocodeService->promocodesList();
         $productForm = new ProductForm();
 
         if ($productForm->load(Yii::$app->request->post()) && $productForm->validate()) {
@@ -117,11 +117,7 @@ class ProductController extends Controller
             }
         }
 
-        return $this->render('create', [
-            'currencyList'   => $currencyList,
-            'promocodesList' => $promocodeList,
-            'productForm'    => $productForm,
-        ]);
+        return $this->render('create', compact('currencyList', 'promocodesList', 'productForm'));
     }
 
     /**
@@ -136,7 +132,7 @@ class ProductController extends Controller
         $model = $this->findModel($id);
         $productForm = new ProductForm($model);
         $currencyList = $this->_currencyService->currencyList();
-        $promocodeList = $this->_promocodeService->promocodesList();
+        $promocodesList = $this->_promocodeService->promocodesList();
 
         if ($productForm->load(Yii::$app->request->post()) && $productForm->validate()) {
             try {
@@ -148,20 +144,15 @@ class ProductController extends Controller
             }
         }
 
-        return $this->render('update', [
-            'model'          => $model,
-            'currencyList'   => $currencyList,
-            'promocodesList' => $promocodeList,
-            'productForm'    => $productForm,
-        ]);
+        return $this->render('update', compact('model', 'currencyList', 'promocodesList', 'productForm'));
     }
 
     /**
-     * Deletes an existing Product model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {

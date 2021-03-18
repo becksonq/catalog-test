@@ -8,8 +8,10 @@ use yii\helpers\Html;
 use yii\bootstrap4\Breadcrumbs;
 use frontend\themes\bs4\assets\AppAsset;
 use common\widgets\alert\Alert;
+use frontend\assets\BootstapIconAsset;
 
 AppAsset::register($this);
+BootstapIconAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
