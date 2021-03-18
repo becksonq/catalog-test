@@ -18,8 +18,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
         <?= Html::a(Yii::t('app', 'Create Product'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
@@ -37,15 +35,11 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'name',
             'slug',
-            'price',
-            'old_price',
             [
-                'attribute' => 'currency_id',
-                'label'     => 'Currency',
-                'value'     => function (Product $model) {
-                    return $model->currency->type;
-                },
-                'filter'    => $currencyList
+                'attribute' =>    'price_id',
+                'header' => 'Price',
+                'value' => 'price.price',
+                'options'   => ['width' => '100'],
             ],
             [
                 'attribute' => 'status',
@@ -53,7 +47,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'     => function (Product $model) use ($statusList) {
                     return $statusList[$model->status];
                 },
-                'filter'    => $statusList
+                'filter'    => $statusList,
+                'options'   => ['width' => '100'],
             ],
             [
                 'header' => '<i class="fa fa-refresh" aria-hidden="true"></i>',

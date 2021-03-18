@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model catalog\models\product\Product
+/* @var $productForm catalog\models\product\ProductForm
  * @var $currencyList array
  * @var $promocodesList array
  */
@@ -14,11 +14,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <?= $this->render('_form', [
-        'model'        => $model,
-        'currencyList' => $currencyList,
+        'productForm'    => $productForm,
+        'currencyList'   => $currencyList,
         'promocodesList' => $promocodesList,
     ]) ?>
 

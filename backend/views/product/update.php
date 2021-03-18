@@ -6,6 +6,8 @@ use yii\helpers\Html;
 /* @var $model catalog\models\product\Product
  * @var $currencyList array
  * @var $promocodesList array
+ * @var $productForm \catalog\models\product\ProductForm
+ * @var $priceForm \catalog\models\price\PriceForm
  */
 
 $this->title = Yii::t('app', 'Update Product: {name}', [
@@ -17,12 +19,12 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 <div class="product-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <?= $this->render('_form', [
-        'model' => $model,
-        'currencyList' => $currencyList,
+        'model'          => $model,
+        'currencyList'   => $currencyList,
         'promocodesList' => $promocodesList,
+        'productForm'    => $productForm,
+        'priceForm'      => $priceForm,
     ]) ?>
 
 </div>

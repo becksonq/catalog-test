@@ -2,10 +2,10 @@
 
 namespace catalog\models\product;
 
-use catalog\models\currency\Currency;
+use catalog\models\price\Price;
 use catalog\modules\promocode\models\Promocode;
+use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -14,16 +14,14 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $name
  * @property string|null $slug
- * @property float|null $price
- * @property float|null $old_price
- * @property int|null $currency_id
+ * @property int $price_id
  * @property int|null $status
  * @property int $promocode_id
  * @property boolean $promo_status
  * @property int $created_at
  * @property int $updated_at
  *
- * @property Currency $currency
+ * @property Price $price
  * @property Promocode $promocode
  */
 class Product extends \yii\db\ActiveRecord
@@ -54,14 +52,14 @@ class Product extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
-            'timestamp' => [
+            'timestamp'     => [
                 'class'      => 'yii\behaviors\TimestampBehavior',
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
                     ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
                 ],
             ],
-            'slug'      => [
+            'slug'          => [
                 'class'                => 'Zelenin\yii\behaviors\Slug',
                 'slugAttribute'        => 'slug',
                 'attribute'            => 'name',
@@ -73,37 +71,11 @@ class Product extends \yii\db\ActiveRecord
                 // If intl extension is enabled, see http://userguide.icu-project.org/transforms/general.
                 'transliterateOptions' => 'Russian-Latin/BGN; Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC;'
             ],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['name',], 'required'],
-            [['currency_id', 'status', 'created_at', 'updated_at', 'promocode_id', 'promo_status',], 'integer'],
-            [['price', 'old_price',], 'double'],
-            [['name', 'slug'], 'string', 'max' => 255],
-            [['slug'], 'unique'],
-            ['status', 'default', 'value' => self::STATUS_DRAFT],
-            [
-                'price',
-                'required',
-                'when'       => function ($model) {
-                    return $model->status == self::STATUS_ACTIVE;
-                },
-                'whenClient' => "function (attribute, value) {
-                    return $('#status').val() == 1;
-                }"
-            ],
-            [
-                ['currency_id'],
-                'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Currency::className(),
-                'targetAttribute' => ['currency_id' => 'id']
+            'saveRelations' => [
+                'class'     => SaveRelationsBehavior::class,
+                'relations' => [
+                    'price',
+                ],
             ],
         ];
     }
@@ -117,9 +89,7 @@ class Product extends \yii\db\ActiveRecord
             'id'           => Yii::t('app', 'ID'),
             'name'         => Yii::t('app', 'Name'),
             'slug'         => Yii::t('app', 'Slug'),
-            'price'        => Yii::t('app', 'Price'),
-            'old_price'    => Yii::t('app', 'Old Price'),
-            'currency_id'  => Yii::t('app', 'Currency ID'),
+            'price_id'     => Yii::t('app', 'Price ID'),
             'status'       => Yii::t('app', 'Status'),
             'promocode_id' => Yii::t('app', 'Promocode'),
             'promo_status' => Yii::t('app', 'Promo Status'),
@@ -129,13 +99,47 @@ class Product extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Currency]].
+     * @param $name
+     * @param $slug
+     * @param $price
+     * @param $currencyId
+     * @param $promocodeId
+     * @return static
+     */
+    public static function create($name, $slug, $priceId, $promocodeId): self
+    {
+        $product = new self();
+        $product->name = $name;
+        $product->slug = $slug;
+        $product->price_id = $priceId;
+        $product->status = self::STATUS_DRAFT;
+        $product->promocode_id = $promocodeId;
+        return $product;
+    }
+
+    /**
+     * @param $name
+     * @param $slug
+     * @param $price
+     * @param $currencyId
+     * @param $promocodeId
+     */
+    public function edit($name, $slug, $priceId, $promocodeId): void
+    {
+        $this->name = $name;
+        $this->slug = $slug;
+        $this->price_id = $priceId;
+        $this->promocode_id = $promocodeId;
+    }
+
+    /**
+     * Gets query for [[Pricies]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getPrice()
     {
-        return $this->hasOne(Currency::className(), ['id' => 'currency_id']);
+        return $this->hasOne(Price::class, ['id' => 'price_id']);
     }
 
     /**
@@ -144,5 +148,15 @@ class Product extends \yii\db\ActiveRecord
     public function getPromocode()
     {
         return $this->hasOne(Promocode::class, ['id' => 'promocode_id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_ALL,
+        ];
     }
 }

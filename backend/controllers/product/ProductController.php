@@ -3,6 +3,8 @@
 namespace backend\controllers\product;
 
 use catalog\models\currency\CurrencyService;
+use catalog\models\price\PriceForm;
+use catalog\models\product\ProductForm;
 use catalog\models\product\ProductService;
 use catalog\modules\promocode\models\PromocodeService;
 use Yii;
@@ -102,18 +104,24 @@ class ProductController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Product();
         $currencyList = $this->_currencyService->currencyList();
         $promocodeList = $this->_promocodeService->promocodesList();
+        $productForm = new ProductForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($productForm->load(Yii::$app->request->post()) && $productForm->validate()) {
+            try {
+                $product = $this->_service->create($productForm);
+                return $this->redirect(['view', 'id' => $product->id]);
+            } catch (\DomainException $e) {
+                //@todo запись в лог
+                throw new \DomainException('Can\t create product');
+            }
         }
 
         return $this->render('create', [
-            'model'          => $model,
             'currencyList'   => $currencyList,
             'promocodesList' => $promocodeList,
+            'productForm'    => $productForm,
         ]);
     }
 
@@ -127,17 +135,28 @@ class ProductController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $productForm = new ProductForm($model);
+        $priceForm = new PriceForm($model->price);
         $currencyList = $this->_currencyService->currencyList();
         $promocodeList = $this->_promocodeService->promocodesList();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+//!d(Yii::$app->request->post());die;
+        if (($productForm->load(Yii::$app->request->post()) && $productForm->validate())
+            && ($priceForm->load(Yii::$app->request->post()) && $priceForm->validate())) {
+            try {
+                $this->_service->edit($id, $productForm, $priceForm);
+                return $this->redirect(['view', 'id' => $model->id]);
+            } catch (\DomainException $e) {
+                //@todo запись в лог
+                throw new \DomainException('Can\t update product');
+            }
         }
 
         return $this->render('update', [
             'model'          => $model,
             'currencyList'   => $currencyList,
             'promocodesList' => $promocodeList,
+            'productForm'    => $productForm,
+            'priceForm'      => $priceForm,
         ]);
     }
 

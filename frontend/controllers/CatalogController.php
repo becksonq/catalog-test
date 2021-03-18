@@ -4,6 +4,7 @@
 namespace frontend\controllers;
 
 
+use catalog\models\product\ProductForm;
 use catalog\models\product\ProductService;
 use catalog\models\product\PromocodeForm;
 use Yii;
