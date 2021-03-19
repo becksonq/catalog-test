@@ -4,6 +4,7 @@
 namespace catalog\models\product;
 
 use catalog\models\currency\Currency;
+use catalog\models\currency\CurrencyDto;
 use catalog\modules\promocode\models\Promocode;
 use catalog\modules\promocode\models\PromocodeRepository;
 use Yii;
@@ -20,15 +21,31 @@ class ProductService
     /** @var PromocodeRepository $_promocodeRepository */
     private $_promocodeRepository;
 
+    /** @var ProductReadRepository */
+    private $productReadRepository;
+
+    /** @var ProductValueObject
+     * @todo реализовать класс
+     */
+    private $_productValueObject;
+
     /**
      * ProductService constructor.
      * @param ProductRepository $repository
+     * @param ProductReadRepository $productReadRepository
      * @param PromocodeRepository $promocodeRepository
+     * @param ProductValueObject $productValueObject
      */
-    public function __construct(ProductRepository $repository, PromocodeRepository $promocodeRepository)
-    {
+    public function __construct(
+        ProductRepository $repository,
+        ProductReadRepository $productReadRepository,
+        PromocodeRepository $promocodeRepository,
+        ProductValueObject $productValueObject
+    ) {
         $this->_repository = $repository;
         $this->_promocodeRepository = $promocodeRepository;
+        $this->productReadRepository = $productReadRepository;
+        $this->_productValueObject = $productValueObject;
     }
 
     /**
@@ -54,7 +71,7 @@ class ProductService
      */
     public function edit(int $id, ProductForm $form)
     {
-        $product = $this->_repository->getById($id);
+        $product = $this->productReadRepository->getById($id);
         $product->edit(
             $form->name,
             $form->slug,
@@ -66,11 +83,20 @@ class ProductService
     }
 
     /**
-     * @return \yii\data\DataProviderInterface
+     * @return array
      */
-    public function findAll()
+    public function findAll(): array
     {
-        return $this->_repository->getAll();
+        $products = [];
+        $dataProvider = $this->productReadRepository->getAll();
+        foreach ($dataProvider->getModels() as $model) {
+            $product = ProductDto::make($model);
+            $currency = CurrencyDto::make($model->currency);
+            $product = ProductDecorator::decorate($product, $currency);
+            $products[] = $product;
+        }
+
+        return $products;
     }
 
     /**
@@ -81,9 +107,9 @@ class ProductService
     public function jsonData(): array
     {
         $data = [];
-        $dataProvider = $this->_repository->getJsonData();
-        foreach ($dataProvider->getModels() as $model){
-           $data['pages'][] = $model;
+        $dataProvider = $this->productReadRepository->getJsonData();
+        foreach ($dataProvider->getModels() as $model) {
+            $data['pages'][] = $model;
         }
         $data['pagination'] = $dataProvider->pagination;
 
@@ -102,7 +128,7 @@ class ProductService
             throw new \DomainException('Promo code not found');
         }
 
-        $products = $this->_repository->getByPromocode($promocode->id);
+        $products = $this->productReadRepository->getByPromocode($promocode->id);
         foreach ($products as $product) {
             $product->promo_status = Product::PROMO_APPLY;
             $product->old_price = $product->price;
@@ -150,7 +176,7 @@ class ProductService
      */
     public function removeDiscount(int $id): void
     {
-        $model = $this->_repository->getById($id);
+        $model = $this->productReadRepository->getById($id);
         $model->promo_status = 0;
         $model->price = $model->old_price;
         $model->old_price = null;
@@ -163,7 +189,7 @@ class ProductService
     public function statusList(): array
     {
         return [
-            Product::STATUS_DRAFT  => 'Черновик',
+            Product::STATUS_DRAFT => 'Черновик',
             Product::STATUS_ACTIVE => 'Активное',
         ];
     }

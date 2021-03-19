@@ -39,11 +39,11 @@ class CatalogController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = $this->_service->findAll();
+        $products = $this->_service->findAll();
         $promocodeForm = new PromocodeForm();
 
         return $this->render('index', [
-            'dataProvider'  => $dataProvider,
+            'products'  => $products,
             'promocodeForm' => $promocodeForm,
         ]);
     }

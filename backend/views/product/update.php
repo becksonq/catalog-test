@@ -18,11 +18,6 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 <div class="product-update">
 
-    <?= $this->render('_form', [
-        'model'          => $model,
-        'currencyList'   => $currencyList,
-        'promocodesList' => $promocodesList,
-        'productForm'    => $productForm,
-    ]) ?>
+    <?= $this->render('_form', compact('model', 'currencyList', 'promocodesList', 'productForm')) ?>
 
 </div>

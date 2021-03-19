@@ -71,7 +71,7 @@ class Product extends \yii\db\ActiveRecord
                 'lowercase'            => true,
                 'immutable'            => false,
                 // If intl extension is enabled, see http://userguide.icu-project.org/transforms/general.
-//                'transliterateOptions' => 'Russian-Latin/BGN; Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC;'
+                'transliterateOptions' => 'Russian-Latin/BGN; Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC;'
             ],
             'saveRelations' => [
                 'class'     => SaveRelationsBehavior::class,

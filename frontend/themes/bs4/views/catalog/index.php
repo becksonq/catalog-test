@@ -3,7 +3,7 @@
 use yii\helpers\Url;
 
 /** @var $this \yii\web\View
- * @var $dataProvider \yii\data\ActiveDataProvider
+ * @var $products array
  * @var $promocodeForm \catalog\models\product\PromocodeForm
  */
 ?>
@@ -27,13 +27,12 @@ use yii\helpers\Url;
 </div>
 
 <div class="col-sm-12 mb-5">
-  <div class="row">
-      <?php
-      foreach ($dataProvider->getModels() as $model) {
-          echo $this->render('_card', [
-              'model' => $model,
-          ]);
-      }
-      ?>
-  </div>
+    <div class="row">
+        <?php
+        foreach ($products as $product) {
+            echo $this->render('_card', [
+                'product' => $product,
+            ]);
+        } ?>
+    </div>
 </div>
