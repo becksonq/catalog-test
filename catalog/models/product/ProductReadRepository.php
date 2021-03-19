@@ -50,6 +50,14 @@ class ProductReadRepository
         return $this->_getProvider($query);
     }
 
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getAllModels()
+    {
+        return $this->product->find()->all();
+    }
+
     public function getJsonData()
     {
         $query = $this->product->find()->alias('p')

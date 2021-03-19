@@ -8,6 +8,7 @@ use catalog\models\currency\CurrencyDto;
 use catalog\modules\promocode\models\Promocode;
 use catalog\modules\promocode\models\PromocodeRepository;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class ProductService
@@ -22,7 +23,7 @@ class ProductService
     private $_promocodeRepository;
 
     /** @var ProductReadRepository */
-    private $productReadRepository;
+    private $_productReadRepository;
 
     /** @var ProductValueObject
      * @todo реализовать класс
@@ -44,7 +45,7 @@ class ProductService
     ) {
         $this->_repository = $repository;
         $this->_promocodeRepository = $promocodeRepository;
-        $this->productReadRepository = $productReadRepository;
+        $this->_productReadRepository = $productReadRepository;
         $this->_productValueObject = $productValueObject;
     }
 
@@ -69,9 +70,9 @@ class ProductService
      * @param ProductForm $form
      * @throws \yii\web\NotFoundHttpException
      */
-    public function edit(int $id, ProductForm $form)
+    public function edit(int $id, ProductForm $form): void
     {
-        $product = $this->productReadRepository->getById($id);
+        $product = $this->_productReadRepository->getById($id);
         $product->edit(
             $form->name,
             $form->slug,
@@ -88,7 +89,7 @@ class ProductService
     public function findAll(): array
     {
         $products = [];
-        $dataProvider = $this->productReadRepository->getAll();
+        $dataProvider = $this->_productReadRepository->getAll();
         foreach ($dataProvider->getModels() as $model) {
             $product = ProductDto::make($model);
             $currency = CurrencyDto::make($model->currency);
@@ -107,7 +108,7 @@ class ProductService
     public function jsonData(): array
     {
         $data = [];
-        $dataProvider = $this->productReadRepository->getJsonData();
+        $dataProvider = $this->_productReadRepository->getJsonData();
         foreach ($dataProvider->getModels() as $model) {
             $data['pages'][] = $model;
         }
@@ -128,7 +129,7 @@ class ProductService
             throw new \DomainException('Promo code not found');
         }
 
-        $products = $this->productReadRepository->getByPromocode($promocode->id);
+        $products = $this->_productReadRepository->getByPromocode($promocode->id);
         foreach ($products as $product) {
             $product->promo_status = Product::PROMO_APPLY;
             $product->old_price = $product->price;
@@ -176,11 +177,20 @@ class ProductService
      */
     public function removeDiscount(int $id): void
     {
-        $model = $this->productReadRepository->getById($id);
+        $model = $this->_productReadRepository->getById($id);
         $model->promo_status = 0;
         $model->price = $model->old_price;
         $model->old_price = null;
         $this->_repository->save($model);
+    }
+
+    /**
+     * @return array$products
+     */
+    public function productList(): array
+    {
+        $products = $this->_productReadRepository->getAllModels();
+        return ArrayHelper::map($products, 'id', 'name');
     }
 
     /**

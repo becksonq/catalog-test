@@ -11,7 +11,7 @@ use yii\web\NotFoundHttpException;
  */
 class ProductRepository
 {
-    /** @var $tableName */
+    /** @var Product $product */
     protected $product;
 
     /**

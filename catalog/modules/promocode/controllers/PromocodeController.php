@@ -2,6 +2,9 @@
 
 namespace catalog\modules\promocode\controllers;
 
+use catalog\models\product\ProductService;
+use catalog\modules\promocode\models\PromocodeForm;
+use catalog\modules\promocode\models\PromocodeService;
 use Yii;
 use catalog\modules\promocode\models\Promocode;
 use catalog\modules\promocode\models\PromocodeSearch;
@@ -14,6 +17,27 @@ use yii\filters\VerbFilter;
  */
 class PromocodeController extends Controller
 {
+    /** @var PromocodeService $_service */
+    private $_service;
+
+    /** @var ProductService $_productService */
+    private $_productService;
+
+    /**
+     * PromocodeController constructor.
+     * @param $id
+     * @param $module
+     * @param PromocodeService $service
+     * @param ProductService $productService
+     * @param array $config
+     */
+    public function __construct($id, $module, PromocodeService $service, ProductService $productService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->_service = $service;
+        $this->_productService = $productService;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -21,7 +45,7 @@ class PromocodeController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class'   => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -39,7 +63,7 @@ class PromocodeController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('@catalog/modules/promocode/views/promocode/index', [
-            'searchModel' => $searchModel,
+            'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -64,15 +88,21 @@ class PromocodeController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Promocode();
+        $promocodeForm = new PromocodeForm();
+        $productList = $this->_productService->productList();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($promocodeForm->load(Yii::$app->request->post()) && $promocodeForm->validate()) {
+            try {
+                $promocode = $this->_service->create($promocodeForm);
+                return $this->redirect(['view', 'id' => $promocode->id]);
+            } catch (\DomainException $e) {
+                //@todo запись в лог
+                throw new \DomainException('Can\t create product');
+            }
         }
 
-        return $this->render('@catalog/modules/promocode/views/promocode/create', [
-            'model' => $model,
-        ]);
+        return $this->render('@catalog/modules/promocode/views/promocode/create',
+            compact('promocodeForm', 'productList'));
     }
 
     /**
@@ -84,15 +114,22 @@ class PromocodeController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $promocode = $this->_service->findById($id);
+        $promocodeForm = new PromocodeForm($promocode);
+        $productList = $this->_productService->productList();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($promocodeForm->load(Yii::$app->request->post()) && $promocodeForm->validate()) {
+            try {
+                $this->_service->edit($id, $promocodeForm);
+                return $this->redirect(['view', 'id' => $promocode->id]);
+            } catch (\DomainException $e) {
+                //@todo запись в лог
+                throw new \DomainException('Can\t update product');
+            }
         }
 
-        return $this->render('@catalog/modules/promocode/views/promocode/update', [
-            'model' => $model,
-        ]);
+        return $this->render('@catalog/modules/promocode/views/promocode/update',
+            compact('promocodeForm', 'productList'));
     }
 
     /**

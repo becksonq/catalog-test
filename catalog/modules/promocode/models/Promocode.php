@@ -37,18 +37,6 @@ class Promocode extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
-        return [
-            [['name', 'value', 'type'], 'required'],
-            [['start', 'end', 'value', 'type'], 'integer'],
-            [['name'], 'string', 'max' => 255],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -59,6 +47,41 @@ class Promocode extends \yii\db\ActiveRecord
             'start' => Yii::t('app', 'Start'),
             'end'   => Yii::t('app', 'End'),
         ];
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @param $type
+     * @param $start
+     * @param $end
+     * @return static
+     */
+    public static function create($name, $value, $type, $start, $end): self
+    {
+        $promocode = new static();
+        $promocode->name = $name;
+        $promocode->value = $value;
+        $promocode->type = $type;
+        $promocode->start = $start;
+        $promocode->end = $end;
+        return $promocode;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @param $type
+     * @param $start
+     * @param $end
+     */
+    public function edit($name, $value, $type, $start, $end): void
+    {
+        $this->name = $name;
+        $this->value = $value;
+        $this->type = $type;
+        $this->start = $start;
+        $this->end = $end;
     }
 
     /**

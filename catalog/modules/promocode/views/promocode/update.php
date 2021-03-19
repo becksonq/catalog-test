@@ -14,8 +14,6 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 <div class="promocode-update">
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+    <?= $this->render('_form', compact('promocodeForm', 'productList')) ?>
 
 </div>
