@@ -10,7 +10,7 @@ return [
     'id' => 'app-frontend',
     'name' => 'Catalog',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'common\bootstrap\SetUp',],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [

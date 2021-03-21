@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($productForm, 'currency_id')->dropDownList($currencyList) ?>
 
-<!--    --><?//= $form->field($productForm, 'promocode_id')->dropDownList($promocodesList, ['prompt' => 'Выберите скидку']) ?>
+    <?= $form->field($productForm, 'promocode_id')->dropDownList($promocodesList, ['prompt' => 'Выберите скидку']) ?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>

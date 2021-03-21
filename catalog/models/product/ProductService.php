@@ -3,10 +3,10 @@
 
 namespace catalog\models\product;
 
-use catalog\models\currency\Currency;
+
 use catalog\models\currency\CurrencyDto;
-use catalog\modules\promocode\models\Promocode;
 use catalog\modules\promocode\models\PromocodeRepository;
+use catalog\modules\promocode\models\store\StoreInterface;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -30,23 +30,35 @@ class ProductService
      */
     private $_productValueObject;
 
+    /** @var StoreInterface */
+    private $_discountStore;
+
+    /** @var PriceCalculator */
+    private $_calculator;
+
     /**
      * ProductService constructor.
      * @param ProductRepository $repository
      * @param ProductReadRepository $productReadRepository
      * @param PromocodeRepository $promocodeRepository
      * @param ProductValueObject $productValueObject
+     * @param StoreInterface $discountStore
+     * @param PriceCalculator $calculator
      */
     public function __construct(
         ProductRepository $repository,
         ProductReadRepository $productReadRepository,
         PromocodeRepository $promocodeRepository,
-        ProductValueObject $productValueObject
+        ProductValueObject $productValueObject,
+        StoreInterface $discountStore,
+        PriceCalculator $calculator
     ) {
         $this->_repository = $repository;
         $this->_promocodeRepository = $promocodeRepository;
         $this->_productReadRepository = $productReadRepository;
         $this->_productValueObject = $productValueObject;
+        $this->_discountStore = $discountStore;
+        $this->_calculator = $calculator;
     }
 
     /**
@@ -91,6 +103,7 @@ class ProductService
         $products = [];
         $dataProvider = $this->_productReadRepository->getAll();
         foreach ($dataProvider->getModels() as $model) {
+            $model = $this->_calculator->setDiscount($model);
             $product = ProductDto::make($model);
             $currency = CurrencyDto::make($model->currency);
             $product = ProductDecorator::decorate($product, $currency);
@@ -121,54 +134,24 @@ class ProductService
      * Применяем скидку
      *
      * @param string $name
+     * @return bool|null
      */
-    public function applyPromocode(string $name): void
+    public function applyPromocode(string $discountName)
     {
-        $promocode = $this->_promocodeRepository->getByName($name);
+        $promocode = $this->_promocodeRepository->getByName($discountName);
         if ($promocode == null) {
-            throw new \DomainException('Promo code not found');
+            return null;
+//            throw new \DomainException('Promo code not found');
         }
 
         $products = $this->_productReadRepository->getByPromocode($promocode->id);
         foreach ($products as $product) {
-            $product->promo_status = Product::PROMO_APPLY;
-            $product->old_price = $product->price;
-            $product->price = $this->createDiscount($product);
             $this->_repository->save($product);
+            $idArray[] = $product->id;
         }
-    }
+        $this->_discountStore->applyDiscount($discountName, $idArray);
 
-    /**
-     * Получаем цену со скидкой
-     *
-     * @param Product $product
-     * @return float|int|null
-     */
-    protected function createDiscount(Product $product)
-    {
-        if ($product->promocode->type == Promocode::RUBLE_DISCOUNT) {
-            if ($product->currency->type == Currency::ORIGIN_PRICE) {
-                $price = $product->price - $product->promocode->value;
-            }
-            if ($product->currency->type == Currency::EURO_PRICE
-                || $product->currency->type == Currency::DOLLAR_PRICE) {
-                $rublePrice = $product->price * $product->currency->rate;
-                $rublePrice = $rublePrice - $product->promocode->value;
-                $price = $rublePrice / $product->currency->rate;
-            }
-        }
-
-        if ($product->promocode->type == Promocode::PERCENT_DISCOUNT) {
-            $price = $product->price - ($product->price * ($product->promocode->value * .01));
-        }
-        if ($product->currency->type == Currency::EURO_PRICE
-            || $product->currency->type == Currency::DOLLAR_PRICE) {
-            $rublePrice = $product->price * $product->currency->rate;
-            $rublePrice = $rublePrice - (($product->promocode->value * .01) * $rublePrice);
-            $price = $rublePrice / $product->currency->rate;
-        }
-
-        return $price;
+        return true;
     }
 
     /**
@@ -177,11 +160,8 @@ class ProductService
      */
     public function removeDiscount(int $id): void
     {
-        $model = $this->_productReadRepository->getById($id);
-        $model->promo_status = 0;
-        $model->price = $model->old_price;
-        $model->old_price = null;
-        $this->_repository->save($model);
+        $product = $this->_productReadRepository->getById($id);
+        $this->_discountStore->removeDiscount($product->promocode->name, $product);
     }
 
     /**
@@ -199,7 +179,7 @@ class ProductService
     public function statusList(): array
     {
         return [
-            Product::STATUS_DRAFT => 'Черновик',
+            Product::STATUS_DRAFT  => 'Черновик',
             Product::STATUS_ACTIVE => 'Активное',
         ];
     }

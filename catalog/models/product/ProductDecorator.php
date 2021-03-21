@@ -12,6 +12,7 @@ class ProductDecorator
     /** @var $_product */
     private $_product;
 
+    /** @var $_currency */
     private $_currency;
 
     /**

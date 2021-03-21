@@ -55,7 +55,11 @@ class CatalogController extends Controller
     {
         $promocodeForm = new PromocodeForm();
         if ($promocodeForm->load(Yii::$app->request->post()) && $promocodeForm->validate()) {
-            $this->_service->applyPromocode(Yii::$app->request->post('PromocodeForm')['name']);
+            $result = $this->_service->applyPromocode(Yii::$app->request->post('PromocodeForm')['name']);
+            if ($result == null) {
+                Yii::$app->session->setFlash('danger', 'Promo code not found');
+                return $this->redirect('index');
+            }
             return $this->redirect('index');
         }
         return false;
