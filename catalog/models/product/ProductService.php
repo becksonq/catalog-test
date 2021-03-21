@@ -106,7 +106,7 @@ class ProductService
             $model = $this->_calculator->setDiscount($model);
             $product = ProductDto::make($model);
             $currency = CurrencyDto::make($model->currency);
-            $product = ProductDecorator::decorate($product, $currency);
+            $product = ProductDecorator::decorate($product, $currency, $model->promocode);
             $products[] = $product;
         }
 

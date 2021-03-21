@@ -9,21 +9,22 @@ namespace catalog\models\product;
  */
 class ProductDecorator
 {
-    /** @var $_product */
     private $_product;
-
-    /** @var $_currency */
     private $_currency;
+    private $_promocode;
+    private $_productIdArray;
 
     /**
      * ProductDecorator constructor.
      * @param $product
      * @param $currency
      */
-    public function __construct($product, $currency)
+    public function __construct($product, $currency, $promocode)
     {
         $this->_product = $product;
         $this->_currency = $currency;
+        $this->_promocode = $promocode;
+        $this->_productIdArray = (\Yii::$app->session->get($this->_promocode->name)) ?: [];
     }
 
     /**
@@ -31,9 +32,9 @@ class ProductDecorator
      * @param $currency
      * @return ProductDecorator
      */
-    public static function decorate($product, $currency): self
+    public static function decorate($product, $currency, $promocode): self
     {
-        return new self($product, $currency);
+        return new self($product, $currency, $promocode);
     }
 
     /**
@@ -101,11 +102,11 @@ class ProductDecorator
     {
         $html = '';
         // Если есть промокод но он не применен
-        if ($this->_product->promocode_id !== null && $this->_product->promo_status == Product::PROMO_NOT_APPLY) {
+        if ($this->_product->promocode_id !== null) {
             $html = '<p class="card-text text-primary">Доступен промокод</p>';
         }
-        if ($this->_product->promocode_id !== null && $this->_product->promo_status == Product::PROMO_APPLY) {
-            $html = '<p class="card-text text-success">Промокод применен</p>';
+        if ($this->_product->promocode_id !== null && in_array($this->_product->id, $this->_productIdArray)) {
+            $html = '<p class="card-text text-success">Применен промокод - ' . $this->_promocode->name . '</p>';
         }
 
         return $html;
